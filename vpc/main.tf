@@ -11,3 +11,9 @@ resource "aws_vpc" "main" {
     var.vpc_tags
   )
 }
+
+resource "aws_internet_gateway" "main" {
+  vpc_id = aws_vpc.main.id #VPC Association
+
+  tags = local.ig_tags
+}
