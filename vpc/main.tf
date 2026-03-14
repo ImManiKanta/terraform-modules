@@ -129,7 +129,7 @@ resource "aws_eip" "main" {
 #create natgateway and attach EIP to NAT 
 resource "aws_nat_gateway" "main" {
   allocation_id = aws_eip.main.id
-  subnet_id     = aws_subnet.private[0].id #Attach to 1st region - us-east-1a
+  subnet_id     = aws_subnet.public[0].id #Attach to 1st region - us-east-1a
 
   tags = merge(
         local.common_tags,
