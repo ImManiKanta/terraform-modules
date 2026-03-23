@@ -14,3 +14,7 @@ variable "domain_name" {
     default = "manidevops.online" 
 }
 
+variable "rule_priority" {
+    
+}
+
