@@ -56,7 +56,7 @@ resource "aws_ami_from_instance" "main" {
 
 resource "aws_lb_target_group" "main" {
   name     = "${var.project}-${var.environment}-${var.component}"
-  port     = 8080
+  port     = local.port_number
   protocol = "HTTP"
   vpc_id   = local.vpc_id
   deregistration_delay = 60
@@ -65,8 +65,8 @@ resource "aws_lb_target_group" "main" {
     healthy_threshold = 2
     interval = 10
     matcher = "200-299"
-    path = "/health"
-    port = 8080
+    path = local.health_check_path
+    port = local.port_number
     protocol = "HTTP"
     timeout = 2
     unhealthy_threshold = 3
@@ -82,6 +82,9 @@ resource "aws_launch_template" "main" {
   instance_initiated_shutdown_behavior = "terminate"
   instance_type = "t3.micro"
   vpc_security_group_ids = local.sg_id
+  
+  # each time we apply terraform this version will be updated as default
+  update_default_version = true
 
   tag_specifications {
     resource_type = "instance"
@@ -176,6 +179,7 @@ resource "aws_autoscaling_policy" "main" {
 }
 
 # This depends on target group
+# if frontend frontend-dev.manidevops.online
 resource "aws_lb_listener_rule" "main" {
   listener_arn = local.backend_alb_listener_arn
   priority     = 10
@@ -187,7 +191,7 @@ resource "aws_lb_listener_rule" "main" {
 
   condition {
     host_header {
-      values = ["${var.component}.backend-alb-${var.environment}.${var.domain_name}"]
+      values = [local.host_header]
     }
   }
 }
